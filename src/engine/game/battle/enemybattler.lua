@@ -144,6 +144,15 @@ function EnemyBattler:init(actor, use_overlay)
 
     self.temporary_mercy = 0
     self.temporary_mercy_percent = nil
+
+    self.graze_tension = 1.6 -- (1/10 of a defend, or cheap spell)
+end
+
+--- Get the default graze tension for this enemy.
+--- Any bullets which don't specify graze tension will use this value.
+---@return number tension The tension to gain when bullets spawned by this enemy are grazed.
+function EnemyBattler:getGrazeTension()
+    return self.graze_tension
 end
 
 ---@param bool boolean
@@ -157,7 +166,7 @@ function EnemyBattler:setTired(bool)
             if self.parent then
                 self:statusMessage("msg", "tired")
                 Assets.playSound("spellcast", 0.5, 0.9)
-            end 
+            end
         end
     else
         self.comment = ""
@@ -759,11 +768,17 @@ function EnemyBattler:forceDefeat(amount, battler)
 end
 
 --- *(Override)* Gets the tension earned by hitting this enemy \
---- *By default, returns `points / 25`*
+--- *By default, returns `points / 25`, or if you have reduced tension, `points / 65`*
 ---@param points number The points of the hit, based on closeness to the target box when attacking, maximum value is `150`
 ---@return number tension
 function EnemyBattler:getAttackTension(points)
-    -- In Deltarune, this is always 10*2.5, except for JEVIL where it's 15*2.5
+    -- Kristal transforms tension from 0-250 (DR) to 0-100.
+    -- In Deltarune, this is (10 * 2.5), except for JEVIL where it's (15 * 2.5)
+    -- And in reduced battles, it's (26 * 2.5)
+
+    if Game.battle:hasReducedTension() then
+        return points / 65
+    end
     return points / 25
 end
 
@@ -874,21 +889,20 @@ function EnemyBattler:onDefeatFatal(damage, battler)
 end
 
 --- Heals the enemy by `amount` health
----@param amount number
-function EnemyBattler:heal(amount)
+---@param amount            number  The amount of health to restore
+---@param sparkle_color?    table   The color of the heal sparkles (defaults to the standard green) or false to not show sparkles
+function EnemyBattler:heal(amount, sparkle_color)
     Assets.stopAndPlaySound("power")
     self.health = self.health + amount
 
-    self:flash()
-
     if self.health >= self.max_health then
         self.health = self.max_health
-        self:statusMessage("msg", "max")
+        self:statusMessage("msg", "max", nil, nil, 8)
     else
-        self:statusMessage("heal", amount, {0, 1, 0})
+        self:statusMessage("heal", amount, {0, 1, 0}, nil, 8)
     end
 
-    self:sparkle()
+    self:healEffect(unpack(sparkle_color or {}))
 end
 
 --- Freezes this enemy and defeats them with the reason `"FROZEN"` \
