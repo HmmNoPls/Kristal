@@ -22,6 +22,7 @@ RUNTIME = 0
 MOD_LOADING = false
 ACTIVE_LIB = nil
 
+ALLOW_DEBUG = true
 DEBUG_RENDER = false
 
 FAST_FORWARD = false

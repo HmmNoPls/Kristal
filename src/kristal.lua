@@ -496,7 +496,7 @@ function Kristal.onKeyPressed(key, is_repeat)
         end
     end
 
-    if Input.shouldProcess(key) and not TextInput.active then
+    if Input.shouldProcess(key) and not TextInput.active and ALLOW_DEBUG then
         if Input.is("debug_menu", key) then
             if Kristal.DebugSystem then
                 Input.clear("debug_menu")
@@ -527,16 +527,16 @@ function Kristal.onKeyPressed(key, is_repeat)
     local console_open = Kristal.Console and Kristal.Console.is_open
 
     if not is_repeat and Input.shouldProcess(key) then
-        if key == "f2" or (Input.is("fast_forward", key) and not console_open) then
+        if (key == "f2" or (Input.is("fast_forward", key) and not console_open)) and ALLOW_DEBUG then
             FAST_FORWARD = not FAST_FORWARD
         elseif key == "f3" then
             love.system.openURL("https://kristal.cc/wiki")
         elseif key == "f4" or (key == "return" and Input.alt()) then
             Kristal.Config["fullscreen"] = not Kristal.Config["fullscreen"]
             love.window.setFullscreen(Kristal.Config["fullscreen"])
-        elseif key == "f6" then
+        elseif key == "f6" and ALLOW_DEBUG then
             DEBUG_RENDER = not DEBUG_RENDER
-        elseif key == "f8" then
+        elseif key == "f8" and ALLOW_DEBUG then
             print("Hotswapping files...\nNOTE: Might be unstable. If anything goes wrong, it's not our fault :P")
             Hotswapper.scan()
         elseif key == "f9" and Input.shift() then
@@ -554,7 +554,7 @@ function Kristal.onKeyPressed(key, is_repeat)
             Assets.playSound("camera_flash")
             SCREENSHOT_DISPLAY = 0
             TAKING_SCREENSHOT = true
-        elseif key == "r" and Input.ctrl() and (not console_open) then
+        elseif key == "r" and Input.ctrl() and (not console_open) and ALLOW_DEBUG then
             -- CTRL+R to reload
             if (not Kristal.isLoading()) and (Kristal.getState() ~= LoadingState) then
                 if Kristal.getModOption("hardReset") or Input.alt() and Input.shift() then

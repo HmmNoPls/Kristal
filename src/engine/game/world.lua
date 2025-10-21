@@ -352,7 +352,7 @@ end
 
 ---@param key string
 function World:onKeyPressed(key)
-    if Kristal.Config["debug"] and Input.ctrl() then
+    if ALLOW_DEBUG and Kristal.Config["debug"] and Input.ctrl() then
         if key == "m" then
             if self.music then
                 if self.music:isPlaying() then

@@ -3060,7 +3060,7 @@ end
 
 ---@param key string
 function Battle:onKeyPressed(key)
-    if Kristal.Config["debug"] and Input.ctrl() then
+    if ALLOW_DEBUG and Kristal.Config["debug"] and Input.ctrl() then
         if key == "h" then
             for _,party in ipairs(self.party) do
                 party:heal(math.huge)
